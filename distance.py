@@ -1,3 +1,20 @@
+import math
+from pyglet import gl
+
+def draw_circle(x, y, radius):
+    iterations = 20
+    s = math.sin(2*math.pi / iterations)
+    c = math.cos(2*math.pi / iterations)
+
+    dx, dy = radius, 0
+
+    gl.glBegin(gl.GL_LINE_STRIP)
+    gl.glColor3d(255,0,0)
+    for i in range(iterations+1):
+        gl.glVertex2f(x+dx, y+dy)
+        dx, dy = (dx*c - dy*s), (dy*c + dx*s)
+    gl.glEnd()
+
 def distance(a, b, wrap_size):
     """Distance in one direction (x or y)"""
     result = abs(a - b)
