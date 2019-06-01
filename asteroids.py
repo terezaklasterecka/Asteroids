@@ -1,5 +1,5 @@
 import space_objects
-import pyglet
+import pyglet,math
 from pyglet import gl
 START_ASTEROIDS = 8
 objects = []
@@ -7,6 +7,24 @@ keys_pressed = set()
 batch = pyglet.graphics.Batch()
 window = pyglet.window.Window(1000, 600)
 window_size = [window.width,window.height]
+
+def draw_circle(x, y, radius):
+    iterations = 20
+    s = math.sin(2*math.pi / iterations)
+    c = math.cos(2*math.pi / iterations)
+
+    dx, dy = radius, 0
+
+    gl.glBegin(gl.GL_LINE_STRIP)
+    gl.glColor3d(255,0,0)
+    for i in range(iterations+1):
+        gl.glVertex2f(x+dx, y+dy)
+        dx, dy = (dx*c - dy*s), (dy*c + dx*s)
+    gl.glEnd()
+
+def tick_all(dt):
+    for object in objects:
+        object.tick(dt,objects)
 
 @window.event()
 def on_draw():
@@ -21,6 +39,8 @@ def on_draw():
 
             # Draw
             batch.draw()
+            for object in objects:
+                draw_circle(object.x, object.y, object.radius)
 
             # Restore remembered state (this cancels the glTranslatef)
             gl.glPopMatrix()
@@ -33,6 +53,7 @@ def on_key_press(symbol, modifiers):
 def on_key_release(symbol, modifiers):
     keys_pressed.remove(symbol)
 
+
 player_ship = space_objects.Spaceship("PNG\playerShip1_orange.png",window_size,keys_pressed, window.width // 2, window.height // 2)
 
 objects = [player_ship]
@@ -41,6 +62,9 @@ for i in range(START_ASTEROIDS):
 
 for object in objects:
     object.load_sprite(batch)
-    pyglet.clock.schedule_interval( object.tick, 1/30)
+
+pyglet.clock.schedule_interval( tick_all, 1/30)
 
 pyglet.app.run()
+
+# pyglet.clock.schedule_once(player_ship.delete(objects), 10)
