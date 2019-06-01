@@ -1,11 +1,12 @@
 import space_objects
 import pyglet
 from pyglet import gl
-
+START_ASTEROIDS = 8
 objects = []
 keys_pressed = set()
 batch = pyglet.graphics.Batch()
 window = pyglet.window.Window(1000, 600)
+window_size = [window.width,window.height]
 
 @window.event()
 def on_draw():
@@ -32,13 +33,14 @@ def on_key_press(symbol, modifiers):
 def on_key_release(symbol, modifiers):
     keys_pressed.remove(symbol)
 
-player_ship1 = space_objects.Spaceship("PNG\playerShip1_orange.png", window.width // 2, window.height // 2)
-player_ship2 = space_objects.Spaceship("PNG\playerShip1_green.png",50, 50, 90)
-player_ship3 = space_objects.Spaceship("PNG\playerShip1_red.png",150, 150, 120)
-objects = [player_ship1, player_ship2, player_ship3]
+player_ship = space_objects.Spaceship("PNG\playerShip1_orange.png",window_size,keys_pressed, window.width // 2, window.height // 2)
+
+objects = [player_ship]
+for i in range(START_ASTEROIDS):
+    objects.append(space_objects.Asteroid(window_size))
 
 for object in objects:
     object.load_sprite(batch)
-    pyglet.clock.schedule_interval( object.tick, 1/30, keys_pressed=keys_pressed, window_size = (window.width,window.height) )
+    pyglet.clock.schedule_interval( object.tick, 1/30)
 
 pyglet.app.run()
